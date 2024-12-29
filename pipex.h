@@ -13,4 +13,11 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
+#  define BUFFER_SIZE = 10
+
+# include <sys/wait.h>
+# include <stdio.h>
+# include "libft/libft.h"
+
+
 #endif

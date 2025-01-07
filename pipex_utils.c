@@ -5,66 +5,72 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/29 18:41:57 by ddo-carm          #+#    #+#             */
-/*   Updated: 2024/12/29 18:41:57 by ddo-carm         ###   ########.fr       */
+/*   Created: 2025/01/07 21:38:11 by ddo-carm          #+#    #+#             */
+/*   Updated: 2025/01/07 21:38:11 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
 
 #include "pipex.h"
 #include "libft/libft.h"
 
-// void	create_pipe(int nbr)
-// {
-// 	int	pipefd[2][nbr];
-
-// 	while (nbr > 0)
-// 	{
-// 		if (pipe(pipefd) == -1)
-// 			return (perror("PIPE ERROR", 1));
-// 		nbr--;
-// 	}
-// 	return ;
-// }
-
-pid_t	*create_child(int nbr)
+// cleans up and frees the children
+void	clean_up(pid_t pid, int n_child)
 {
-	pid_t	*pid;
-	int		i;
-
-	pid = calloc(nbr, sizeof(pid_t));
-	if (!pid)
-		return (perror("MEM ALLOCATION FAILED"), NULL);
-	i = 0;
-	while (i < nbr)
+	while (n_child >= 0)
 	{
-		pid[i] = fork();
-		if (pid[i] == -1)
-			return (perror("FORK ERROR"), free(pid), NULL);
-		else if (pid[i] == 0)
-		{
-			printf("I am the child %d\n", getpid());
-			exit(0);
-		}
-		i++;
+		waitpid(pid[n_child], NULL, 0);
+		n_child--;
+	}
+	free(pid);
+}
+
+//create a pipe
+int	create_pipe(int pipefd[2])
+{
+	if (pipe(pipefd) == -1)
+	{
+		perror("PIPE ERROR");
+		return (-1);
+	}
+	return (0);
+}
+
+//create a child
+pid_t	create_child(void)
+{
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		perror("FORK ERROR");
+		return (-1);
+	}
+	else if (pid == 0)
+	{
+		printf("I am the child %d\n", getpid());
+		exit(EXIT_SUCCESS);
 	}
 	return (pid);
 }
 
-int main(void)
-{
-	int i = 0;
-	int nbr = 4;
-	pid_t *pid = create_child(i);
+// int main(void)
+// {
+// 	int i = 0;
+// 	int nbr = 4;
+// 	pid_t *pid = create_child(nbr);
 
-    if (!pid)
-        return 1;
-	while (i < nbr)
-	{
-		printf("I am the parent: %i\n", pid[i]);
-		i++;
-		waitpid(pid[i], NULL, 0);
-	}
-	free(pid);
-	return (0);
-}
+//     if (!pid)
+//         return (1);
+// 	while (i < nbr)
+// 	{
+// 		if (pid[i] > 0)
+// 		{
+// 			waitpid(pid[i], NULL, 0);
+// 			printf("I am the parent of: %i\n", pid[i]);
+// 		}
+// 		i++;
+// 	}
+// 	free(pid);
+// 	return (0);
+// }

@@ -13,19 +13,16 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
-#  define BUFFER_SIZE = 10
-
 # include <sys/wait.h>
 # include <stdio.h>
 # include "libft/libft.h"
 
-int		pipeline(void);
-void	exec_cmd(int n);
-int		write_file(int n);
-int		read_file(int n);
-void	clean_up(pid_t *pid, int n_child);
-int		*create_pipe(void);
-pid_t	*create_child(void);
-
+void	exec_cmd(char *cmd, char **env);
+void	child(char **av, int *pipe_fd, char **env);
+void	parent(char **av, int *pipe_fd, char **env);
+int		open_file(char *file, int child_or_not);
+char	*get_env(char *name, char **env);
+char	*get_path(char *cmd, char **env);
+void	free_subs(char **subs);
 
 #endif

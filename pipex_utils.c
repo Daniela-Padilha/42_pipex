@@ -3,74 +3,115 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/07 21:38:11 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/07 21:38:11 by ddo-carm         ###   ########.fr       */
+/*   Created: 2025/01/08 17:52:51 by ddo-carm          #+#    #+#             */
+/*   Updated: 2025/01/08 17:52:53 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "libft/libft.h"
 
-// cleans up and frees the children
-void	clean_up(pid_t pid, int n_child)
+//info           --> Open file with specific flags depending on the process 
+//					 that we are in
+//file           --> Str with the name of the file
+//child_or_not   --> Checks if we are in the child process
+//return         --> Fd of the file openned, or -1 if error
+
+int	open_file(char *file, int child_or_not)
 {
-	while (n_child >= 0)
-	{
-		waitpid(pid[n_child], NULL, 0);
-		n_child--;
-	}
-	free(pid);
+	int	fd;
+
+	if (child_or_not == 0)
+		fd = open(file, O_RDONLY, 0777);
+	if (child_or_not > 0)
+		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+	if (fd == -1)
+		exit(0);
+	return (fd);
 }
 
-//create a pipe
-int	create_pipe(int pipefd[2])
+//info       --> Get the environment variable
+//name       --> What to search for
+//env        --> All environmental variables
+//return     --> The environment variable or NULL if it doesn't find it
+
+char	*get_env(char *name, char **env)
 {
-	if (pipe(pipefd) == -1)
+	char *sub;
+	int		i;
+	int		j;
+
+	i = 0;
+	while (env[i])
 	{
-		perror("PIPE ERROR");
-		return (-1);
+		j = 0;
+		while (env[i][j] && anv[i][j] != '=')
+			j++;
+		sub = ft_substr(env[i], 0, j);
+		if (ft_strcmp(sub, name) == 0)
+		{
+			free(sub);
+			return (env[i] + j + 1);
+		}
+		free(sub);
+		i++;
 	}
-	return (0);
+	return (NULL);
 }
 
-//create a child
-pid_t	create_child(void)
-{
-	pid_t	pid;
+//info       --> Free the strings inside an array one by one
+//subs       --> Array of strs to be freed 
 
-	pid = fork();
-	if (pid == -1)
+void	free_subs(char **subs)
+{
+	int	i;
+
+	i = 0;
+	while(subs[i])
 	{
-		perror("FORK ERROR");
-		return (-1);
+		free(subs[i]);
+		i++
 	}
-	else if (pid == 0)
-	{
-		printf("I am the child %d\n", getpid());
-		exit(EXIT_SUCCESS);
-	}
-	return (pid);
+	free(subs);
 }
 
-// int main(void)
-// {
-// 	int i = 0;
-// 	int nbr = 4;
-// 	pid_t *pid = create_child(nbr);
+//info        --> Get path for the cmd
+//cmd         --> Comand to be executed
+//env         --> All environmental variables
+//beginning   --> Isolates only the env PATH and splits it into strs with the
+//                beginning of the path for the cmd
+//middle_path --> Adds the "/" to make the middle part of a path
+//cmd_args    --> Array of the args of the command
+//exec        --> Adds the cmd to the path, completing the executable path
+//return      --> The path to the cmd
 
-//     if (!pid)
-//         return (1);
-// 	while (i < nbr)
-// 	{
-// 		if (pid[i] > 0)
-// 		{
-// 			waitpid(pid[i], NULL, 0);
-// 			printf("I am the parent of: %i\n", pid[i]);
-// 		}
-// 		i++;
-// 	}
-// 	free(pid);
-// 	return (0);
-// }
+char	*get_path(char *cmd, char **env)
+{
+	int		i;
+	char	**beginning;
+	char	*middle_path;
+	char	**cmd_args;
+	char	*exec;
+	
+	i = 0;
+	beginning = fr_split(get_env("PATH", env), ':');
+	cmd_args = ft_split(cmd, " ");
+	while (beginning[i])
+	{
+		middle_path = ft_strjoin(beginning, '/');
+		exec = ft_strjoin(middle_path, cmd_args[0]);
+		free(middle_path);
+		if (access(exec, F_OK | X_OK) == 0)
+		{
+			free_subs(beginning);
+			free_subs(cmd_args);
+			return (exec);
+		}
+		free(exec);
+	}
+	free_subs(beginning);
+	free_subs(cmd_args);
+	return (cmd);
+}

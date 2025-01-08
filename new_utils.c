@@ -19,6 +19,16 @@ int	open_file(char *file, int child_or_not)
 	return (fd);
 }
 
+//info       --> Get the environment variable
+//name       --> What to search for
+//env        --> 
+//return     --> The environment variable
+
+char	*get_env(char *name, char **env)
+{
+
+}
+
 //info       --> Get path for the cmd
 //cmd        --> Comand to be executed
 //env        --> 
@@ -26,5 +36,12 @@ int	open_file(char *file, int child_or_not)
 
 char	*get_path(char *cmd, char **env)
 {
+	
 
+	return (cmd);
 }
+
+if (access(path, X_OK) == -1)
+		return (perror("ACCESS FAILED"), 1);
+	if (execve(path, cmd, NULL) == -1)
+		return (perror("EXEC FAILED"), 1);

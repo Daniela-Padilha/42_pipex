@@ -45,7 +45,7 @@ void	parent(char **av, int *pipe_fd, char **env)
 {
 	int	fd;
 
-	fd = open_file(av[1], O);
+	fd = open_file(av[4], 1);
 	dup2(fd, 1);
 	dup2(pipe_fd[0], 0);
 	close(pipe_fd[1]);

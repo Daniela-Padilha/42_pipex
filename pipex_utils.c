@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 17:52:51 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/08 17:52:53 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/11 20:13:01 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,90 +28,62 @@ int	open_file(char *file, int child_or_not)
 	if (child_or_not > 0)
 		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd == -1)
-		exit(0);
+	{
+		perror("ERROR: opening file failed");
+		exit(EXIT_FAILURE);
+	}
 	return (fd);
 }
+//info    --> Free all the strings in an array and the array itself
+//paths   --> Array of strings to be freed
 
-//info       --> Get the environment variable
-//name       --> What to search for
-//env        --> All environmental variables
-//return     --> The environment variable or NULL if it doesn't find it
-
-char	*get_env(char *name, char **env)
-{
-	char *sub;
-	int		i;
-	int		j;
-
-	i = 0;
-	while (env[i])
-	{
-		j = 0;
-		while (env[i][j] && anv[i][j] != '=')
-			j++;
-		sub = ft_substr(env[i], 0, j);
-		if (ft_strcmp(sub, name) == 0)
-		{
-			free(sub);
-			return (env[i] + j + 1);
-		}
-		free(sub);
-		i++;
-	}
-	return (NULL);
-}
-
-//info       --> Free the strings inside an array one by one
-//subs       --> Array of strs to be freed 
-
-void	free_subs(char **subs)
+void	free_paths(char **paths)
 {
 	int	i;
 
 	i = 0;
-	while(subs[i])
+	while (paths[i])
 	{
-		free(subs[i]);
-		i++
+		free(paths[i]);
+		i++;
 	}
-	free(subs);
+	free(paths);
 }
 
 //info        --> Get path for the cmd
 //cmd         --> Comand to be executed
 //env         --> All environmental variables
-//beginning   --> Isolates only the env PATH and splits it into strs with the
+//paths       --> Isolates only the env PATH and splits it into strs with the
 //                beginning of the path for the cmd
-//middle_path --> Adds the "/" to make the middle part of a path
-//cmd_args    --> Array of the args of the command
+//part_path   --> Adds the "/" to make the middle part of a path
 //exec        --> Adds the cmd to the path, completing the executable path
 //return      --> The path to the cmd
 
 char	*get_path(char *cmd, char **env)
 {
 	int		i;
-	char	**beginning;
-	char	*middle_path;
-	char	**cmd_args;
+	char	**paths;
+	char	*part_path;
 	char	*exec;
-	
+
 	i = 0;
-	beginning = fr_split(get_env("PATH", env), ':');
-	cmd_args = ft_split(cmd, " ");
-	while (beginning[i])
+	while (ft_strnstr(env[i], "PATH", 4) == NULL)
+		i++;
+	paths = ft_split(env[i] + 5, ':');
+	i = 0;
+	while (paths[i])
 	{
-		middle_path = ft_strjoin(beginning, '/');
-		exec = ft_strjoin(middle_path, cmd_args[0]);
-		free(middle_path);
+		part_path = ft_strjoin(paths[i], "/");
+		exec = ft_strjoin(part_path, cmd);
+		free(part_path);
 		if (access(exec, F_OK | X_OK) == 0)
 		{
-			free_subs(beginning);
-			free_subs(cmd_args);
+			free_paths(paths);
 			return (exec);
 		}
 		free(exec);
+		i++;
 	}
-	free_subs(beginning);
-	free_subs(cmd_args);
-	return (cmd);
+	free_paths(paths);
+	return (NULL);
 }

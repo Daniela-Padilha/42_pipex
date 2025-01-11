@@ -19,22 +19,18 @@
 
 
 
-NAME = pipex.a
-TEST_NAME = pipex_test.a
-LIBFT_D = libft
-LIBFT = $(LIBFT_D)/libft.a
+NAME = pipex
+LIBFT = libft/libft.a
 SRCS_D = .
 HEADERS = .
 
 #source files
-SRC = $(SRCS_D)/ft_printf.c \
-		$(SRCS_D)/ft_printf_utils.c \
-		$(SRCS_D)/ft_hex_utils.c
+SRC = $(SRCS_D)/pipex.c \
+		$(SRCS_D)/pipex_utils.c 
 
-MAIN = $(SRCS_D)/main.c
 
 #object files
-# OBJ = $(SRC:.c=.o)
+OBJ = $(SRC:.c=.o)
 
 #		   ________________________________________________
 #  _______|                                               |_______
@@ -57,40 +53,20 @@ AR = ar rcs
 # /__________)                                        (__________\ 
 
 
-all: $(LIBFT) $(NAME)
+all: $(NAME) 
 
-$(LIBFT):
-	@make -C $(LIBFT_D)
-
-$(NAME): $(OBJ)
-	@$(AR) $(NAME) $(OBJ)
+$(NAME): $(OBJ) $(LIBFT)
+	make all -C libft
+	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) -Llibft -lft
 	@echo "$(BGRN)✨Compilation completed✨"
 
-%.o: %.c $(HEADERS) $(LIBFT)
-	@$(CC) $(CFLAGS) -c $< -o $@ -L$(LIBFT_D) -lft
+ %.o: %.c $(HEADERS)
+	@$(CC) $(CFLAGS) -c $< -o $@
 	@echo "$(BMAG)Compiling..."
 
-#          ________________________________________________
-# ________|                                               |_______
-# \       |                   TEST RULES                  |      /
-#  \      |                                               |     /
-#  /      |_______________________________________________|     \ 
-# /__________)                                        (__________\ 
-
-#TESTING
-test: all
-	@$(CC) $(CFLAGS) $(MAIN) $(SRC) -o $(TEST_NAME)
-	@echo "$(BGRN)$(TEST_NAME) created successfully"
-	@./$(TEST_NAME)
-	@echo "$(BGRN)✨Test completed✨"
-
-cleantest:
-	@$(RM) $(OBJ_MAIN) $(TEST_NAME)
-	@echo "$(BMAG)✨$(TEST_NAME) was removed✨"
-
-retest: cleantest test
-	@echo "$(BMAG)✨Retest was $(BGRN)successfull✨"
-
+$(LIBFT):
+	@make -C libft
+	@echo "$(BGRN)✨libft compilation completed✨"
 
 #          ________________________________________________
 # ________|                                               |_______
@@ -102,13 +78,13 @@ retest: cleantest test
 #remove .o
 clean:
 	@$(RM) $(OBJ)
-	@make clean -C $(LIBFT_D)
+	@make clean -C libft
 	@echo "$(BMAG)✨Objects removed $(BGRN)successfully✨"
 
 #clean and remove
-fclean: clean cleantest
+fclean: clean
 	@$(RM) $(NAME)
-	@make fclean -C $(LIBFT_D)
+	@make fclean -C libft
 	@echo "$(BMAG)✨Program removed $(BGRN)successfully✨"
 
 #remake
@@ -125,15 +101,12 @@ re: fclean all
 #help
 help:
 	@echo "✳$(BMAG) make  $(BWHI)    -> $(BMAG)compiles the lib"
-	@echo "$(BWHI)✳$(BMAG) test      $(BWHI)-> $(BMAG)compiles the lib with the main"
 	@echo "$(BWHI)✳$(BMAG) clean    $(BWHI) -> $(BMAG)removes all objects"
 	@echo "$(BWHI)✳$(BMAG) fclean    $(BWHI)-> $(BMAG)removes all objects plus the program"
 	@echo "$(BWHI)✳$(BMAG) re        $(BWHI)-> $(BMAG)removes all objects plus the program and recompiles the lib"
-	@echo "$(BWHI)✳$(BMAG) cleantest $(BWHI)-> $(BMAG)removes all test files"
-	@echo "$(BWHI)✳$(BMAG) retest    $(BWHI)-> $(BMAG)removes test files and recompiles"
 
 #Phony targets to avoid clashes
-.PHONY: all clean fclean re help test cleantest retest
+.PHONY: all clean fclean re help
 
 #          ________________________________________________
 # ________|                                               |_______

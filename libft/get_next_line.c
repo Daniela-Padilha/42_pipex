@@ -31,7 +31,7 @@ char	*ft_join_free(char *buffer, char *tmp_buffer)
 char	*ft_read_file(int fd, char	*buffer)
 {
 	char	*tmp_buffer;
-	ssize_t		bytes_read;
+	ssize_t	bytes_read;
 
 	if (!buffer)
 		buffer = ft_calloc(1, 1);

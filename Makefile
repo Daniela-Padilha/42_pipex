@@ -20,17 +20,14 @@
 
 
 NAME = pipex
-LIBFT = libft/libft.a
+LIBFT_D = ./libft
+LIBFT = $(LIBFT_D)/libft.a
 SRCS_D = .
-HEADERS = .
 
 #source files
 SRC = $(SRCS_D)/pipex.c \
 		$(SRCS_D)/pipex_utils.c 
 
-
-#object files
-OBJ = $(SRC:.c=.o)
 
 #		   ________________________________________________
 #  _______|                                               |_______
@@ -43,7 +40,6 @@ OBJ = $(SRC:.c=.o)
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 RM = rm -f
-AR = ar rcs
 
 #          ________________________________________________
 # ________|                                               |_______
@@ -53,19 +49,14 @@ AR = ar rcs
 # /__________)                                        (__________\ 
 
 
-all: $(NAME) 
-
-$(NAME): $(OBJ) $(LIBFT)
-	make all -C libft
-	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) -Llibft -lft
+$(NAME): $(SRC) $(LIBFT)
+	$(CC) $(CFLAGS) $(SRC) $(LIBFT) -o $(NAME)
 	@echo "$(BGRN)✨Compilation completed✨"
 
- %.o: %.c $(HEADERS)
-	@$(CC) $(CFLAGS) -c $< -o $@
-	@echo "$(BMAG)Compiling..."
+all: $(NAME) 
 
 $(LIBFT):
-	@make -C libft
+	@make -C $(LIBFT_D)	
 	@echo "$(BGRN)✨libft compilation completed✨"
 
 #          ________________________________________________
@@ -77,18 +68,18 @@ $(LIBFT):
 
 #remove .o
 clean:
-	@$(RM) $(OBJ)
-	@make clean -C libft
+	@make clean -C $(LIBFT_D)
 	@echo "$(BMAG)✨Objects removed $(BGRN)successfully✨"
 
 #clean and remove
 fclean: clean
-	@$(RM) $(NAME)
-	@make fclean -C libft
+	@$(RM) $(NAME) $(LIBFT)
+	@make fclean -C $(LIBFT_D)
 	@echo "$(BMAG)✨Program removed $(BGRN)successfully✨"
 
 #remake
-re: fclean all
+re: fclean
+	make all
 	@echo "$(BMAG)✨Re-compile was $(BGRN)successfull✨"
 
 #          ________________________________________________
@@ -100,7 +91,7 @@ re: fclean all
 
 #help
 help:
-	@echo "✳$(BMAG) make  $(BWHI)    -> $(BMAG)compiles the lib"
+	@echo "✳$(BMAG) make      $(BWHI)-> $(BMAG)compiles the lib"
 	@echo "$(BWHI)✳$(BMAG) clean    $(BWHI) -> $(BMAG)removes all objects"
 	@echo "$(BWHI)✳$(BMAG) fclean    $(BWHI)-> $(BMAG)removes all objects plus the program"
 	@echo "$(BWHI)✳$(BMAG) re        $(BWHI)-> $(BMAG)removes all objects plus the program and recompiles the lib"

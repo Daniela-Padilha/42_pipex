@@ -38,7 +38,7 @@ SRC = $(SRCS_D)/pipex.c \
 
 
 CC = cc
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
 
 #          ________________________________________________

@@ -56,7 +56,7 @@ SRC = $(SRCS_D)/ft_isalpha.c \
 	$(SRCS_D)/ft_putendl_fd.c \
 	$(SRCS_D)/ft_putnbr_fd.c \
 	$(SRCS_D)/ft_strtrim.c \
-	$(SRCS_D)/ft_split.c 
+	$(SRCS_D)/ft_split.c \
 
 BONUS_SRC = $(SRCS_D)/ft_lstnew_bonus.c \
 			$(SRCS_D)/ft_lstadd_front_bonus.c \
@@ -80,7 +80,7 @@ GNL_SRC = $(SRCS_D)/get_next_line.c \
 #object files
 OBJ = $(SRC:.c=.o)
 BONUS_OBJ = $(BONUS_SRC:.c=.o)
-FTPRINTF_OBJ = $(FTPRINF_SRC:.c=.o)
+FTPRINTF_OBJ = $(FTPRINTF_SRC:.c=.o)
 GNL_OBJ = $(GNL_SRC:.c=.o)
 
 #		   ________________________________________________

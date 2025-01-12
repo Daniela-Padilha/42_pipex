@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 17:52:51 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/11 20:13:01 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/12 17:31:17 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	open_file(char *file, int child_or_not)
 		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd == -1)
 	{
-		perror("ERROR: opening file failed");
+		ft_printf("Error: no such file or directory: %s", file);
 		exit(EXIT_FAILURE);
 	}
 	return (fd);
@@ -86,4 +86,39 @@ char	*get_path(char *cmd, char **env)
 	}
 	free_paths(paths);
 	return (NULL);
+}
+
+//info     --> Execute a comand
+//cmd      --> Comand to be executed
+//env      --> All environmental variables
+//path     --> Path to the command
+//cmd_args --> Array of the args of the command
+
+void	exec_cmd(char *cmd, char **env)
+{
+	char	*path;
+	char	**cmd_args;
+
+	cmd_args = ft_split(cmd, ' ');
+	if (!cmd_args)
+	{
+		ft_printf("Error: command not found: %s", cmd);
+		exit(EXIT_FAILURE);
+	}
+	path = get_path(cmd_args[0], env);
+	if (!path)
+	{
+		free_paths(cmd_args);
+		ft_printf("Error: command not found: %s", cmd);
+		exit(EXIT_FAILURE);
+	}
+	if (execve(path, cmd_args, env) == -1)
+	{
+		free(path);
+		free_paths(cmd_args);
+		ft_printf("Error: command not found: %s", cmd);
+		exit(EXIT_FAILURE);
+	}
+	free(path);
+	free_paths(cmd_args);
 }

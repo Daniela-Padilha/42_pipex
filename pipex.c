@@ -3,50 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 17:52:33 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/11 20:13:11 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/12 17:04:59 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "libft/libft.h"
-
-//info     --> Execute a comand
-//cmd      --> Comand to be executed
-//env      --> All environmental variables
-//path     --> Path to the command
-//cmd_args --> Array of the args of the command
-
-void	exec_cmd(char *cmd, char **env)
-{
-	char	*path;
-	char	**cmd_args;
-
-	cmd_args = ft_split(cmd, ' ');
-	if (!cmd_args)
-	{
-		perror("ERROR: command is NULL");
-		exit(EXIT_FAILURE);
-	}
-	path = get_path(cmd[0], env);
-	if (!path)
-	{
-		free_paths(cmd_args);
-		perror("ERROR: command not found. Execution failed");
-		exit(EXIT_FAILURE);
-	}
-	if (execve(path, cmd_args, env) == -1)
-	{
-		free(path);
-		free_paths(cmd_args);
-		perror("ERROR: command not found. Execution failed");
-		exit(EXIT_FAILURE);
-	}
-	free(path);
-	free_paths(cmd_args);
-}
 
 //info       --> Create child routine
 //av         --> Arg that indicates the file to open
@@ -133,7 +98,7 @@ int	main(int ac, char **av, char **env)
 	}
 	else
 	{
-		perror("Format must be: ./pipex infile cmd cmd outfile\n");
+		ft_printf("Error: Format must be './pipex infile cmd cmd outfile'");
 		exit(EXIT_FAILURE);
 	}
 	return (0);

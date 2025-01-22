@@ -3,36 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/08 17:52:51 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/15 17:10:34 by ddo-carm         ###   ########.fr       */
+/*   Created: 2025/01/22 14:03:29 by ddo-carm          #+#    #+#             */
+/*   Updated: 2025/01/22 18:00:06 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "libft/libft.h"
-
-
-//info  --> Display error messages into stderr
-//msg   --> Error message to display
-//name  --> Name of the file or cmd to complete message
-
-int	ft_error(char *msg, char *name, int n)
-{
-	int	len;
-
-	len = ft_strlen(msg);
-	name_len = ft_strlen(name);
-	if (msg == NULL)
-		write(2, "(null)", 6);
-	if (msg != NULL)
-		write(2, &msg, len);
-	if (name != NULL)
-		write(2, &name, name_len);
-	write(2, "\n", 1);
-	return (n);
-}
 
 //info           --> Open file with specific flags depending on the process 
 //					 that we are in
@@ -45,11 +24,11 @@ int	open_file(char *file, int child_or_not)
 	int	fd;
 
 	if (child_or_not == 0)
-		fd = open(file, O_RDONLY, 0777);
+		fd = open(file, O_RDONLY, 0111);
 	if (child_or_not > 0)
-		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
+		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
-		return (ft_error(ERR_FILE, file, -1), NULL);
+		return (ft_error(ERR_FILE, file), -1);
 	return (fd);
 }
 //info    --> Free all the strings in an array and the array itself
@@ -87,9 +66,9 @@ char	*get_path(char *cmd, char **env)
 	i = 0;
 	while (ft_strnstr(env[i], "PATH=", 5) == NULL)
 		i++;
-	paths = ft_split(env[i] + 5, ':');
+	paths = ft_split(ft_strtrim(env[i], "PATH="), ':');
 	if (!paths)
-		return (ft_error(ERR_MALLOC, "ft_split in get_path", -1), NULL);
+		return (ft_error(ERR_MALLOC, "ft_split in get_path"), NULL);
 	i = 0;
 	while (paths[i])
 	{
@@ -101,6 +80,7 @@ char	*get_path(char *cmd, char **env)
 		free(exec);
 		i++;
 	}
+	write(1, "Error: command not found: \n", 27);
 	return (free_paths(paths), NULL);
 }
 
@@ -112,23 +92,24 @@ char	*get_path(char *cmd, char **env)
 
 void	exec_cmd(char *cmd, char **env)
 {
+	ft_printf("%s\n", ERR_CMD);
 	char	*path;
 	char	**cmd_args;
 
 	cmd_args = ft_split(cmd, ' ');
 	if (!cmd_args)
-		return (ft_error(ERR_CMD, cmd), NULL);
+		ft_error(ERR_CMD, cmd);
 	path = get_path(cmd_args[0], env);
 	if (!path)
 	{
 		free_paths(cmd_args);
-		return (ft_error(ERR_CMD, cmd, -1), NULL);
+		return ;
 	}
 	if (execve(path, cmd_args, env) == -1)
 	{
 		free(path);
 		free_paths(cmd_args);
-		return (ft_error(ERR_EXECVE, NULL, -1), NULL);
+		ft_printf("%s\n", ERR_EXECVE);
 	}
 	free(path);
 	free_paths(cmd_args);

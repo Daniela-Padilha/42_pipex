@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/27 17:07:54 by ddo-carm          #+#    #+#             */
-/*   Updated: 2024/12/27 17:07:54 by ddo-carm         ###   ########.fr       */
+/*   Created: 2025/01/22 14:03:11 by ddo-carm          #+#    #+#             */
+/*   Updated: 2025/01/22 14:03:11 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 # define ERR_PIPE "Error: pipe failure"
 # define ERR_FORK "Error: fork failure"
 # define ERR_EXECVE "Error: execve failure"
+# define ERR_MALLOC "Error: malloc failure in "
 
 void	exec_cmd(char *cmd, char **env);
 void	child(char **av, int *pipe_fd, char **env);
@@ -31,6 +32,6 @@ void	parent(char **av, int *pipe_fd, char **env);
 int		open_file(char *file, int child_or_not);
 char	*get_path(char *cmd, char **env);
 void	free_paths(char **paths);
-int		(char *msg, char *name);
+void	ft_error(char *msg, char *name);
 
 #endif

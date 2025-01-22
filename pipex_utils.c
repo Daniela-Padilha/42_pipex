@@ -3,15 +3,36 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 17:52:51 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/12 17:31:17 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/15 17:10:34 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "libft/libft.h"
+
+
+//info  --> Display error messages into stderr
+//msg   --> Error message to display
+//name  --> Name of the file or cmd to complete message
+
+int	ft_error(char *msg, char *name, int n)
+{
+	int	len;
+
+	len = ft_strlen(msg);
+	name_len = ft_strlen(name);
+	if (msg == NULL)
+		write(2, "(null)", 6);
+	if (msg != NULL)
+		write(2, &msg, len);
+	if (name != NULL)
+		write(2, &name, name_len);
+	write(2, "\n", 1);
+	return (n);
+}
 
 //info           --> Open file with specific flags depending on the process 
 //					 that we are in
@@ -28,10 +49,7 @@ int	open_file(char *file, int child_or_not)
 	if (child_or_not > 0)
 		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0777);
 	if (fd == -1)
-	{
-		ft_printf("Error: no such file or directory: %s", file);
-		exit(EXIT_FAILURE);
-	}
+		return (ft_error(ERR_FILE, file, -1), NULL);
 	return (fd);
 }
 //info    --> Free all the strings in an array and the array itself
@@ -67,9 +85,11 @@ char	*get_path(char *cmd, char **env)
 	char	*exec;
 
 	i = 0;
-	while (ft_strnstr(env[i], "PATH", 4) == NULL)
+	while (ft_strnstr(env[i], "PATH=", 5) == NULL)
 		i++;
 	paths = ft_split(env[i] + 5, ':');
+	if (!paths)
+		return (ft_error(ERR_MALLOC, "ft_split in get_path", -1), NULL);
 	i = 0;
 	while (paths[i])
 	{
@@ -77,15 +97,11 @@ char	*get_path(char *cmd, char **env)
 		exec = ft_strjoin(part_path, cmd);
 		free(part_path);
 		if (access(exec, F_OK | X_OK) == 0)
-		{
-			free_paths(paths);
-			return (exec);
-		}
+			return (free_paths(paths), exec);
 		free(exec);
 		i++;
 	}
-	free_paths(paths);
-	return (NULL);
+	return (free_paths(paths), NULL);
 }
 
 //info     --> Execute a comand
@@ -101,23 +117,18 @@ void	exec_cmd(char *cmd, char **env)
 
 	cmd_args = ft_split(cmd, ' ');
 	if (!cmd_args)
-	{
-		ft_printf("Error: command not found: %s", cmd);
-		exit(EXIT_FAILURE);
-	}
+		return (ft_error(ERR_CMD, cmd), NULL);
 	path = get_path(cmd_args[0], env);
 	if (!path)
 	{
 		free_paths(cmd_args);
-		ft_printf("Error: command not found: %s", cmd);
-		exit(EXIT_FAILURE);
+		return (ft_error(ERR_CMD, cmd, -1), NULL);
 	}
 	if (execve(path, cmd_args, env) == -1)
 	{
 		free(path);
 		free_paths(cmd_args);
-		ft_printf("Error: command not found: %s", cmd);
-		exit(EXIT_FAILURE);
+		return (ft_error(ERR_EXECVE, NULL, -1), NULL);
 	}
 	free(path);
 	free_paths(cmd_args);

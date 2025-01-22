@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/08 17:52:33 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/12 17:04:59 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/15 17:11:19 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,17 +24,13 @@ void	child(char **av, int *pipe_fd, char **env)
 
 	fd = open_file(av[1], 0);
 	if (fd == -1)
-	{
-		perror("ERROR: opening input file failed");
-		exit(EXIT_FAILURE);
-	}
+		return (ft_error(ERR_ALLOW, av[4], 0), fd);
 	if (dup2(pipe_fd[1], 1) == -1 || dup2(fd, 0) == -1)
 	{
-		perror("ERROR: fd failure");
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 		close(fd);
-		exit(EXIT_FAILURE);
+		return (ft_error(ERR_FILE, av[4], 0), fd);
 	}
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
@@ -53,17 +49,13 @@ void	parent(char **av, int *pipe_fd, char **env)
 
 	fd = open_file(av[4], 1);
 	if (fd == -1)
-	{
-		perror("ERROR: opening output file failed");
-		exit(EXIT_FAILURE);
-	}
+		return (ft_error(ERR_ALLOW, av[4], 0), fd);
 	if (dup2(pipe_fd[0], 0) == -1 || dup2(fd, 1) == -1)
 	{
 		close(pipe_fd[0]);
 		close(pipe_fd[1]);
 		close(fd);
-		perror("ERROR: fd failure");
-		exit(EXIT_FAILURE);
+		return (ft_error(ERR_FILE, av[4], 0), fd);
 	}
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
@@ -84,10 +76,10 @@ int	main(int ac, char **av, char **env)
 	if (ac == 5)
 	{
 		if (pipe(pipe_fd) == -1)
-			exit(EXIT_FAILURE);
+			return (perror(ERR_PIPE), 1);
 		pid = fork();
 		if (pid == -1)
-			exit(EXIT_FAILURE);
+			return (perror(ERR_FORK), 1);
 		if (pid == 0)
 			child(av, pipe_fd, env);
 		else
@@ -97,9 +89,6 @@ int	main(int ac, char **av, char **env)
 		}
 	}
 	else
-	{
-		ft_printf("Error: Format must be './pipex infile cmd cmd outfile'");
-		exit(EXIT_FAILURE);
-	}
+		return (perror(ERR_ARGS), 1);
 	return (0);
 }

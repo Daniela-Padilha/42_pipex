@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:29 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/22 18:00:06 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/23 00:19:48 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	open_file(char *file, int child_or_not)
 	if (child_or_not > 0)
 		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd == -1)
-		return (ft_error(ERR_FILE, file), -1);
+		return (ft_printf("%s%s\n", ERR_FILE, file), -1);
 	return (fd);
 }
 //info    --> Free all the strings in an array and the array itself
@@ -64,11 +64,11 @@ char	*get_path(char *cmd, char **env)
 	char	*exec;
 
 	i = 0;
-	while (ft_strnstr(env[i], "PATH=", 5) == NULL)
+	while (env[i] && !ft_strnstr(env[i], "PATH=", 5))
 		i++;
 	paths = ft_split(ft_strtrim(env[i], "PATH="), ':');
 	if (!paths)
-		return (ft_error(ERR_MALLOC, "ft_split in get_path"), NULL);
+		return (ft_printf("%sft_split in get_path\n", ERR_MALLOC), NULL);
 	i = 0;
 	while (paths[i])
 	{
@@ -80,8 +80,9 @@ char	*get_path(char *cmd, char **env)
 		free(exec);
 		i++;
 	}
-	write(1, "Error: command not found: \n", 27);
-	return (free_paths(paths), NULL);
+	write(2, "Error: command not found: ", 26);
+	write(2, cmd, ft_strlen(cmd));
+	return (write(2, "\n", 1), free_paths(paths), NULL);
 }
 
 //info     --> Execute a comand
@@ -92,13 +93,15 @@ char	*get_path(char *cmd, char **env)
 
 void	exec_cmd(char *cmd, char **env)
 {
-	ft_printf("%s\n", ERR_CMD);
 	char	*path;
 	char	**cmd_args;
 
 	cmd_args = ft_split(cmd, ' ');
 	if (!cmd_args)
-		ft_error(ERR_CMD, cmd);
+	{
+		ft_printf("%s%s\n", ERR_CMD, cmd);
+		return ;
+	}
 	path = get_path(cmd_args[0], env);
 	if (!path)
 	{
@@ -110,7 +113,6 @@ void	exec_cmd(char *cmd, char **env)
 		free(path);
 		free_paths(cmd_args);
 		ft_printf("%s\n", ERR_EXECVE);
+		return ;
 	}
-	free(path);
-	free_paths(cmd_args);
 }

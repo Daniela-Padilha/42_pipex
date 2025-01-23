@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/22 17:58:56 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/23 00:00:35 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,45 +20,53 @@
 
 void	child(char **av, int *pipe_fd, char **env)
 {
-	int	fd;
+	int	input_fd;
 
-	fd = open_file(av[1], 0);
-	if (fd == -1)
-		ft_error(ERR_ALLOW, av[4]);
-	if (dup2(pipe_fd[1], 1) == -1 || dup2(fd, 0) == -1)
+	input_fd = open_file(av[1], 0);
+	if (input_fd == -1)
 	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		close(fd);
-		ft_error(ERR_FILE, av[4]);
+		ft_printf("%s%s\n", ERR_ALLOW, av[4]);
+		return ;
+	}
+	if (dup2(pipe_fd[1], 1) == -1 || dup2(input_fd, 0) == -1)
+	{
+		ft_printf("%s%s\n", ERR_FILE, av[1]);
+		close(input_fd);
+		return ;
 	}
 	close(pipe_fd[0]);
-	close(fd);
+	close(input_fd);
 	exec_cmd(av[2], env);
+	close(pipe_fd[1]);
 }
 
 //info       --> Create parent routine
 //av         --> Arg that indicates the file to open
 //pipe_fd    --> Pipe fd[2], o read e o write
 //env        --> All environmental variables
+//pid		 --> The pid of the child the parent has to wait for
 
-void	parent(char **av, int *pipe_fd, char **env)
+void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid)
 {
-	int	fd;
+	int	output_fd;
 
-	fd = open_file(av[4], 1);
-	if (fd == -1)
-		ft_error(ERR_ALLOW, av[4]);
-	if (dup2(pipe_fd[0], 0) == -1 || dup2(fd, 1) == -1)
+	output_fd = open_file(av[4], 1);
+	if (output_fd == -1)
 	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		close(fd);
-		ft_error(ERR_FILE, av[4]);
+		ft_printf("%s%s\n", ERR_ALLOW, av[4]);
+		return ;
+	}
+	if (dup2(pipe_fd[0], 0) == -1 || dup2(output_fd, 1) == -1)
+	{
+		ft_printf("%s%s\n", ERR_FILE, av[4]);
+		close(output_fd);
+		return ;
 	}
 	close(pipe_fd[1]);
-	close(fd);
+	close(output_fd);
+	waitpid(child_pid, NULL, 0);
 	exec_cmd(av[3], env);
+	close(pipe_fd[0]);
 }
 
 //info       --> Create parent routine
@@ -71,26 +79,16 @@ int	main(int ac, char **av, char **env)
 	int		pipe_fd[2];
 	pid_t	pid;
 
-	if (ac == 5)
-	{
-		if (pipe(pipe_fd) == -1)
-			return (perror(ERR_PIPE), 1);
-		pid = fork();
-		if (pid == -1)
-			return (perror(ERR_FORK), 1);
-		if (pid == 0)
-		{
-			child(av, pipe_fd, env);
-			close(pipe_fd[1]);
-		}
-		else
-		{
-			waitpid(pid, NULL, 0);
-			parent(av, pipe_fd, env);
-			close(pipe_fd[0]);
-		}
-	}
-	else
+	if (ac != 5)
 		return (ft_printf("%s\n",ERR_ARGS), 1);
+	if (pipe(pipe_fd) == -1)
+		return (ft_printf("%s\n", ERR_PIPE), 1);
+	pid = fork();
+	if (pid == -1)
+		return (ft_printf("%s\n", ERR_FORK), 1);
+	if (pid == 0)
+		child(av, pipe_fd, env);
+	else if (pid > 0)
+		parent(av, pipe_fd, env, pid);
 	return (0);
 }

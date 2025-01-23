@@ -18,13 +18,16 @@
 # include "libft/libft.h"
 
 # define ERR_FILE "Error: no such file or directory: "
-# define ERR_ALLOW "Error: permission denied: "
+// # define ERR_ALLOW "Error: permission denied: "
 # define ERR_CMD "Error: command not found: "
-# define ERR_ARGS "Error: Format must be ./pipex infile cmd cmd outfile"
+# define ERR_ARGS "Error: format must be ./pipex infile cmd cmd outfile"
 # define ERR_PIPE "Error: pipe failure"
 # define ERR_FORK "Error: fork failure"
-# define ERR_EXECVE "Error: execve failure"
+# define ERR_EXECVE "Error: execve failure for: "
 # define ERR_MALLOC "Error: malloc failure in "
+# define ERR_OPEN_INPUT "Error: unable to open input file: "
+# define ERR_OPEN_OUTPUT "Error: unable to open output file: "
+# define ERR_DUP "Error: dup2 failure"
 
 void	exec_cmd(char *cmd, char **env);
 void	child(char **av, int *pipe_fd, char **env);

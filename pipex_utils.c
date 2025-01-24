@@ -6,33 +6,12 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:29 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/23 15:47:16 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/24 15:56:20 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "libft/libft.h"
-
-//info           --> Open file with specific flags depending on the process 
-//					 that we are in
-//file           --> Str with the name of the file
-//child_or_not   --> Checks if we are in the child process
-//return         --> Fd of the file openned, or -1 if error
-
-int	open_file(char *file, int child_or_not)
-{
-	int	fd;
-
-	if (child_or_not == 0)
-		fd = open(file, O_RDONLY);
-	else
-		fd = open(file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (fd == -1)
-		return (ft_printf("%s%s\n", ERR_FILE, file), -1);
-	return (fd);
-}
-//info    --> Free all the strings in an array and the array itself
-//paths   --> Array of strings to be freed
 
 void	free_paths(char **paths)
 {
@@ -82,7 +61,7 @@ char	*get_path(char *cmd, char **env)
 	}
 	write(2, &ERR_CMD, 26);
 	write(2, cmd, ft_strlen(cmd));
-	return (write(2, "\n", 1), free_paths(paths), NULL);
+	return (write(2, "\n", 1), free_paths(paths), exit(CMD_NOT_FOUND), NULL);
 }
 
 //info     --> Execute a comand
@@ -100,19 +79,17 @@ void	exec_cmd(char *cmd, char **env)
 	if (!cmd_args)
 	{
 		ft_printf("%s%s\n", ERR_CMD, cmd);
-		return ;
+		exit(EXIT_FAILURE);
 	}
 	path = get_path(cmd_args[0], env);
 	if (!path)
 	{
 		free_paths(cmd_args);
-		return ;
+		exit(EXIT_FAILURE);
 	}
-	if (execve(path, cmd_args, env) == -1)
-	{
-		free(path);
-		free_paths(cmd_args);
-		ft_printf("%s%s\n", ERR_EXECVE, cmd);
-		return ;
-	}
+	execve(path, cmd_args, env);
+	free(path);
+	free_paths(cmd_args);
+	ft_printf("%s%s\n", ERR_EXECVE, cmd);
+	exit(EXIT_FAILURE);
 }

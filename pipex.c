@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/24 15:27:02 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/24 15:55:56 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ void	child(char **av, int *pipe_fd, char **env)
 {
 	int	input_fd;
 
-	input_fd = open_file(av[1], 0);
+	input_fd = open(av[1], O_RDONLY);
 	if (input_fd == -1)
 	{
 		ft_printf("%s%s\n", ERR_OPEN_INPUT, av[1]);
@@ -39,8 +39,6 @@ void	child(char **av, int *pipe_fd, char **env)
 	close(pipe_fd[1]);
 	close(input_fd);
 	exec_cmd(av[2], env);
-	exit(EXIT_FAILURE);
-	return ;
 }
 
 //info       --> Create parent routine
@@ -53,7 +51,7 @@ void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid)
 {
 	int	output_fd;
 
-	output_fd = open_file(av[4], 1);
+	output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (output_fd == -1)
 	{
 		ft_printf("%s%s\n", ERR_OPEN_OUTPUT, av[4]);
@@ -71,8 +69,6 @@ void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid)
 	close(output_fd);
 	waitpid(child_pid, NULL, 0);
 	exec_cmd(av[3], env);
-	exit(EXIT_FAILURE);
-	return ;
 }
 
 //info       --> Create parent routine

@@ -27,7 +27,6 @@
 # define ERR_MALLOC "Error: malloc failure in "
 # define ERR_OPEN_INPUT "Error: unable to open input file: "
 # define ERR_OPEN_OUTPUT "Error: unable to open output file: "
-# define ERR_DUP "Error: dup2 failure\n"
 
 void	exec_cmd(char *cmd, char **env);
 void	child(char **av, int *pipe_fd, char **env);

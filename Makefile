@@ -18,8 +18,8 @@
 # /__________)                                        (__________\ 
 
 
-
 NAME = pipex
+NAME_BONUS = pipex_bonus
 LIBFT_D = ./libft
 LIBFT = $(LIBFT_D)/libft.a
 SRCS_D = .
@@ -27,6 +27,9 @@ SRCS_D = .
 #source files
 SRC = $(SRCS_D)/pipex.c \
 		$(SRCS_D)/pipex_utils.c 
+
+SRC_BONUS = $(SRCS_D)/pipex_bonus.c \
+			$(SRCS_D)/pipex_utils_bonus.c 
 
 
 #		   ________________________________________________
@@ -40,6 +43,7 @@ SRC = $(SRCS_D)/pipex.c \
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -g
 RM = rm -f
+VAL = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
 #          ________________________________________________
 # ________|                                               |_______
@@ -55,9 +59,14 @@ $(NAME): $(SRC) $(LIBFT)
 
 all: $(NAME) 
 
+bonus: $(SRC_BONUS) $(LIBFT)
+	$(CC) $(CFLAGS) $(SRC_BONUS) $(LIBFT) -o $(NAME_BONUS)
+	@echo "$(BGRN)✨Bonus compilation completed✨"
+
 $(LIBFT):
 	@make -C $(LIBFT_D)	
 	@echo "$(BGRN)✨libft compilation completed✨"
+
 
 #          ________________________________________________
 # ________|                                               |_______
@@ -73,7 +82,7 @@ clean:
 
 #clean and remove
 fclean: clean
-	@$(RM) $(NAME) $(LIBFT)
+	@$(RM) $(NAME) $(NAME_BONUS)
 	@make fclean -C $(LIBFT_D)
 	@echo "$(BMAG)✨Program removed $(BGRN)successfully✨"
 

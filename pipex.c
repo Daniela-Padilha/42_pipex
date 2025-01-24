@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/24 15:55:56 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/24 16:19:00 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,13 @@ void	child(char **av, int *pipe_fd, char **env)
 {
 	int	input_fd;
 
+	close(pipe_fd[0]);
 	input_fd = open(av[1], O_RDONLY);
 	if (input_fd == -1)
 	{
 		ft_printf("%s%s\n", ERR_OPEN_INPUT, av[1]);
+		close(pipe_fd[1]);
+		close(input_fd);
 		exit(EXIT_FAILURE);
 	}
 	if (dup2(pipe_fd[1], STDOUT_FILENO) == -1
@@ -35,9 +38,6 @@ void	child(char **av, int *pipe_fd, char **env)
 		close(input_fd);
 		return ;
 	}
-	close(pipe_fd[0]);
-	close(pipe_fd[1]);
-	close(input_fd);
 	exec_cmd(av[2], env);
 }
 
@@ -51,10 +51,12 @@ void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid)
 {
 	int	output_fd;
 
+	close(pipe_fd[1]);
 	output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (output_fd == -1)
 	{
 		ft_printf("%s%s\n", ERR_OPEN_OUTPUT, av[4]);
+		close(pipe_fd[0]);
 		exit(EXIT_FAILURE);
 	}
 	if (dup2(pipe_fd[0], STDIN_FILENO) == -1
@@ -62,9 +64,9 @@ void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid)
 	{
 		ft_printf("%s\n", ERR_DUP);
 		close(output_fd);
+		close(pipe_fd[0]);
 		return ;
 	}
-	close(pipe_fd[1]);
 	close(pipe_fd[0]);
 	close(output_fd);
 	waitpid(child_pid, NULL, 0);
@@ -82,12 +84,12 @@ int	main(int ac, char **av, char **env)
 	pid_t	pid;
 
 	if (ac != 5)
-		return (ft_printf("%s\n", ERR_ARGS), 1);
+		return (ft_putstr_fd(ERR_ARGS, 2), 1);
 	if (pipe(pipe_fd) == -1)
-		return (ft_printf("%s\n", ERR_PIPE), 1);
+		return (ft_putstr_fd(ERR_PIPE, 2), 1);
 	pid = fork();
 	if (pid == -1)
-		return (ft_printf("%s\n", ERR_FORK), 1);
+		return (ft_putstr_fd(ERR_FORK, 2), 1);
 	if (pid == 0)
 		child(av, pipe_fd, env);
 	else if (pid > 0)

@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:29 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/24 15:56:20 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/24 16:26:32 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,10 @@ void	exec_cmd(char *cmd, char **env)
 	char	**cmd_args;
 
 	cmd_args = ft_split(cmd, ' ');
-	if (!cmd_args)
-	{
-		ft_printf("%s%s\n", ERR_CMD, cmd);
-		exit(EXIT_FAILURE);
-	}
-	path = get_path(cmd_args[0], env);
+	if (ft_strchr(cmd_args[0], '/'))
+		path = ft_strdup(cmd_args[0]);
+	else
+		path = get_path(cmd_args[0], env);
 	if (!path)
 	{
 		free_paths(cmd_args);

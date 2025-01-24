@@ -6,12 +6,15 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:29 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/24 16:26:32 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/24 16:34:22 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include "libft/libft.h"
+
+//info    --> Free all the strings in an array and the array itself
+//paths   --> Array of strings to be freed
 
 void	free_paths(char **paths)
 {

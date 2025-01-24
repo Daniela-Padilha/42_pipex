@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/23 16:20:42 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/24 15:27:02 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,10 @@ void	child(char **av, int *pipe_fd, char **env)
 	if (input_fd == -1)
 	{
 		ft_printf("%s%s\n", ERR_OPEN_INPUT, av[1]);
-		return ;
+		exit(EXIT_FAILURE);
 	}
-	if (dup2(pipe_fd[1], STDOUT_FILENO) == -1 || dup2(input_fd, STDIN_FILENO) == -1)
+	if (dup2(pipe_fd[1], STDOUT_FILENO) == -1
+		|| dup2(input_fd, STDIN_FILENO) == -1)
 	{
 		ft_printf("%s\n", ERR_DUP);
 		close(input_fd);
@@ -38,6 +39,8 @@ void	child(char **av, int *pipe_fd, char **env)
 	close(pipe_fd[1]);
 	close(input_fd);
 	exec_cmd(av[2], env);
+	exit(EXIT_FAILURE);
+	return ;
 }
 
 //info       --> Create parent routine
@@ -54,9 +57,10 @@ void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid)
 	if (output_fd == -1)
 	{
 		ft_printf("%s%s\n", ERR_OPEN_OUTPUT, av[4]);
-		return ;
+		exit(EXIT_FAILURE);
 	}
-	if (dup2(pipe_fd[0], STDIN_FILENO) == -1 || dup2(output_fd, STDOUT_FILENO) == -1)
+	if (dup2(pipe_fd[0], STDIN_FILENO) == -1
+		|| dup2(output_fd, STDOUT_FILENO) == -1)
 	{
 		ft_printf("%s\n", ERR_DUP);
 		close(output_fd);
@@ -67,6 +71,8 @@ void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid)
 	close(output_fd);
 	waitpid(child_pid, NULL, 0);
 	exec_cmd(av[3], env);
+	exit(EXIT_FAILURE);
+	return ;
 }
 
 //info       --> Create parent routine

@@ -31,7 +31,7 @@
 
 void	exec_cmd(char *cmd, char **env);
 void	child(char **av, int *pipe_fd, char **env);
-void	parent(char **av, int *pipe_fd, char **env, pid_t child_pid);
+void	parent(char **av, int *pipe_fd, char **env);
 char	*get_path(char *cmd, char **env);
 void	free_paths(char **paths);
 

@@ -52,18 +52,18 @@ VAL = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 #  /      |_______________________________________________|     \ 
 # /__________)                                        (__________\ 
 
+all: $(NAME) 
 
 $(NAME): $(SRC) $(LIBFT)
 	$(CC) $(CFLAGS) $(SRC) $(LIBFT) -o $(NAME)
 	@echo "$(BGRN)✨Compilation completed✨"
 
-all: $(NAME) 
+bonus: $(NAME_BONUS)
 
 $(NAME_BONUS): $(SRC_BONUS) $(LIBFT)
 	$(CC) $(CFLAGS) $(SRC_BONUS) $(LIBFT) -o $(NAME_BONUS)
+	@touch $(NAME)_bonus
 	@echo "$(BGRN)✨Bonus compilation completed✨"
-
-bonus: $(NAME_BONUS)
 
 $(LIBFT):
 	@make -C $(LIBFT_D)	

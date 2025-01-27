@@ -16,6 +16,15 @@
 # include <stdio.h>
 # include "libft/libft.h"
 
+typedef struct s_pipex
+{
+	int		ac;
+	char	**av;
+	char	**env;
+	int		pipe_fd[2];
+}   t_pipex;
+
+
 # define CMD_NOT_FOUND 127
 
 # define ERR_CMD "Error: command not found: "
@@ -29,10 +38,12 @@
 # define ERR_OPEN_OUTPUT "Error: unable to open output file: "
 
 void	exec_cmd(char *cmd, char **env);
-void	child(char **av, int *pipe_fd, char **env);
-void	parent(char **av, int *pipe_fd, char **env);
+void	child(char **av, int *pipe_fd, char **env, int cmd_index);
+void	parent(int ac, char **av, int *pipe_fd, char **env, int cmd_index);
 char	*get_path(char *cmd, char **env);
 void	free_paths(char **paths);
 void	handle_here_doc(const char *limiter, int *pipe_fd);
+void	main_process(int ac, char **av, char **env, int cmd_index);
+pid_t	forking(int *pipe_fd);
 
 #endif

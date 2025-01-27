@@ -15,7 +15,7 @@
 
 //info       --> Handle the here doc correctly
 //limiter    --> Str that indicates the end of prompt
-//pipe_fd    --> Pipe fd[2]
+//pipe_fd    --> Pipe fd[2], read and write
 
 void	handle_here_doc(const char *limiter, int *pipe_fd)
 {
@@ -42,7 +42,7 @@ void	handle_here_doc(const char *limiter, int *pipe_fd)
 
 //info       --> Create child routine
 //av         --> Arg that indicates the file to open
-//pipe_fd    --> Pipe fd[2], o read e o write
+//pipe_fd    --> Pipe fd[2], read and write
 //env        --> All environmental variables
 
 void	child(char **av, int *pipe_fd, char **env, int cmd_index)
@@ -74,7 +74,7 @@ void	child(char **av, int *pipe_fd, char **env, int cmd_index)
 
 //info       --> Create parent routine
 //av         --> Arg that indicates the file to open
-//pipe_fd    --> Pipe fd[2], o read e o write
+//pipe_fd    --> Pipe fd[2], read and write
 //env        --> All environmental variables
 //child_pid	 --> The pid of the child the parent has to wait for
 
@@ -130,11 +130,11 @@ void	main_process(int ac, char **av, char **env, int cmd_index)
 		cmd_index++;
 	}
 	final_output_fd = open(av[ac - 1], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (final_output_fd == -1)
-        exit(ft_printf("%s%s\n", ERR_OPEN_OUTPUT, av[ac - 1]));
-    dup2(final_output_fd, STDOUT_FILENO);
-    close(final_output_fd);
-    exec_cmd(av[cmd_index], env);
+	if (final_output_fd == -1)
+		exit(ft_printf("%s%s\n", ERR_OPEN_OUTPUT, av[ac - 1]));
+	dup2(final_output_fd, STDOUT_FILENO);
+	close(final_output_fd);
+	exec_cmd(av[cmd_index], env);
 }
 
 int	main(int ac, char **av, char **env)
@@ -146,37 +146,22 @@ int	main(int ac, char **av, char **env)
 		return (ft_putstr_fd(ERR_ARGS, 2), 1);
 	if ((ft_strncmp(av[1], "here_doc", 8) == 0 && ac < 6))
 		return (ft_putstr_fd(ERR_ARGS_BONUS, 2), 1);
-    if (ft_strncmp(av[1], "here_doc", 8) == 0)
-    {
-        if (pipe(pipe_fd) == -1)
-            return (ft_putstr_fd(ERR_PIPE, 2), 1);
-        pid = forking(pipe_fd);
-        if (pid == 0)
+	if (ft_strncmp(av[1], "here_doc", 8) == 0)
+	{
+		if (pipe(pipe_fd) == -1)
+			return (ft_putstr_fd(ERR_PIPE, 2), 1);
+		pid = forking(pipe_fd);
+		if (pid == 0)
 			handle_here_doc(av[2], pipe_fd);
-        else
-        {
+		else
+		{
 			close(pipe_fd[1]);
 			dup2(pipe_fd[0], STDIN_FILENO);
 			close(pipe_fd[0]);
 			main_process(ac, av, env, 3);
-        }
-    }
+		}
+	}
 	else
 		main_process(ac, av, env, 2);
 	return (0);
-}
-
-pid_t forking(int *pipe_fd)
-{
-	pid_t	pid;
-
-	pid = fork();
-	if (pid == -1)
-	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		ft_putstr_fd(ERR_FORK, 2);
-		exit(EXIT_FAILURE);
-	}
-	return (pid);
 }

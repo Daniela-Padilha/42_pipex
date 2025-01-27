@@ -22,8 +22,7 @@ typedef struct s_pipex
 	char	**av;
 	char	**env;
 	int		pipe_fd[2];
-}   t_pipex;
-
+}	t_pipex;
 
 # define CMD_NOT_FOUND 127
 

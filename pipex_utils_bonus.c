@@ -13,6 +13,24 @@
 #include "pipex_bonus.h"
 #include "libft/libft.h"
 
+//info    --> Create a pipe and security condition in case of error
+//pipe_fd --> Pipe fd[2], read and write
+
+pid_t	forking(int *pipe_fd)
+{
+	pid_t	pid;
+
+	pid = fork();
+	if (pid == -1)
+	{
+		close(pipe_fd[0]);
+		close(pipe_fd[1]);
+		ft_putstr_fd(ERR_FORK, 2);
+		exit(EXIT_FAILURE);
+	}
+	return (pid);
+}
+
 //info    --> Free all the strings in an array and the array itself
 //paths   --> Array of strings to be freed
 

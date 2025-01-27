@@ -20,6 +20,7 @@
 
 # define ERR_CMD "Error: command not found: "
 # define ERR_ARGS "Error: format must be ./pipex infile cmd cmd outfile\n"
+# define ERR_ARGS_BONUS "Error: try ./pipex here_doc LIMITER cmd cmd1 file\n"
 # define ERR_PIPE "Error: pipe failure\n"
 # define ERR_FORK "Error: fork failure\n"
 # define ERR_EXECVE "Error: execve failure for: "
@@ -32,5 +33,6 @@ void	child(char **av, int *pipe_fd, char **env);
 void	parent(char **av, int *pipe_fd, char **env);
 char	*get_path(char *cmd, char **env);
 void	free_paths(char **paths);
+void	handle_here_doc(const char *limiter, int *pipe_fd);
 
 #endif

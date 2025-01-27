@@ -13,6 +13,33 @@
 #include "pipex_bonus.h"
 #include "libft/libft.h"
 
+//info       --> Handle the here doc correctly
+//limiter    --> Str that indicates the end of prompt
+//pipe_fd    --> Pipe fd[2]
+
+void	handle_here_doc(const char *limiter, int *pipe_fd)
+{
+	char	*line;
+
+	close(pipe_fd[0]);
+	while (1)
+	{
+		ft_printf("> ");
+		line = get_next_line(STDIN_FILENO);
+		if (!line)
+			break ;
+		if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
+			&& line[ft_strlen(limiter)] == '\n')
+		{
+			free(line);
+			break ;
+		}
+		write(pipe_fd[1], line, ft_strlen(line));
+		free(line);
+	}
+	close(pipe_fd[1]);
+}
+
 //info       --> Create child routine
 //av         --> Arg that indicates the file to open
 //pipe_fd    --> Pipe fd[2], o read e o write
@@ -23,7 +50,13 @@ void	child(char **av, int *pipe_fd, char **env)
 	int	input_fd;
 
 	close(pipe_fd[0]);
-	input_fd = open(av[1], O_RDONLY);
+	if (ft_strncmp(av[1], "here_doc", 8) == 0)
+	{
+		handle_here_doc(av[2], pipe_fd);
+		exit(EXIT_SUCCESS);
+	}
+	else
+		input_fd = open(av[1], O_RDONLY);
 	if (input_fd == -1)
 	{
 		ft_printf("%s%s\n", ERR_OPEN_INPUT, av[1]);
@@ -32,6 +65,8 @@ void	child(char **av, int *pipe_fd, char **env)
 	}
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	dup2(input_fd, STDIN_FILENO);
+	close(pipe_fd[1]);
+	close(input_fd);
 	exec_cmd(av[2], env);
 }
 //info       --> Create parent routine
@@ -46,7 +81,7 @@ void	parent(char **av, int *pipe_fd, char **env)
 
 	close(pipe_fd[1]);
 	if (ft_strncmp(av[1], "here_doc", 8) == 0)
-		output_fd = open(av[4], O_WRONLY | O_CREAT | O_APPEND, 0644);
+		output_fd = open(av[5], O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
 		output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (output_fd == -1)
@@ -57,7 +92,12 @@ void	parent(char **av, int *pipe_fd, char **env)
 	}
 	dup2(pipe_fd[0], STDIN_FILENO);
 	dup2(output_fd, STDOUT_FILENO);
-	exec_cmd(av[3], env);
+	close(pipe_fd[0]);
+	close(output_fd);
+	if (ft_strncmp(av[1], "here_doc", 8) == 0)
+		exec_cmd(av[4], env);
+	else
+		exec_cmd(av[3], env);
 }
 
 //info       --> Create parent routine
@@ -70,8 +110,10 @@ int	main(int ac, char **av, char **env)
 	int		pipe_fd[2];
 	pid_t	pid;
 
-	if (ac != 5)
+	if ((ft_strncmp(av[1], "here_doc", 8) != 0) && (ac < 5))
 		return (ft_putstr_fd(ERR_ARGS, 2), 1);
+	if ((ft_strncmp(av[1], "here_doc", 8) == 0) && (ac != 6))
+		return (ft_putstr_fd(ERR_ARGS_BONUS, 2), 1);
 	if (pipe(pipe_fd) == -1)
 		return (ft_putstr_fd(ERR_PIPE, 2), 1);
 	pid = fork();

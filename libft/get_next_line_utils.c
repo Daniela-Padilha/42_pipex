@@ -37,29 +37,29 @@
 // 	return (res);
 // }
 
-char	*ft_strchr(const char *s, int c)
-{
-	return (ft_memchr(s, c, ft_strlen_until(s, '\0') + 1));
-}
+// char	*ft_strchr(const char *s, int c)
+// {
+// 	return (ft_memchr(s, c, ft_strlen_until(s, '\0') + 1));
+// }
 
-void	*ft_memchr(const void *s, int c, size_t n)
-{
-	size_t	i;
-	char	c_c;
-	char	*s_c;
+// void	*ft_memchr(const void *s, int c, size_t n)
+// {
+// 	size_t	i;
+// 	char	c_c;
+// 	char	*s_c;
 
-	i = 0;
-	c_c = (char)c;
-	s_c = (char *)s;
-	while (i < n)
-	{
-		if (s_c[i] == c_c)
-			return ((void *)&s_c[i]);
-		else
-			i++;
-	}
-	return (NULL);
-}
+// 	i = 0;
+// 	c_c = (char)c;
+// 	s_c = (char *)s;
+// 	while (i < n)
+// 	{
+// 		if (s_c[i] == c_c)
+// 			return ((void *)&s_c[i]);
+// 		else
+// 			i++;
+// 	}
+// 	return (NULL);
+// }
 
 size_t	ft_strlen_until(const char *s, char c)
 {

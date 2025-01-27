@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/24 17:16:02 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/27 18:32:23 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,8 @@ void	child(char **av, int *pipe_fd, char **env)
 	}
 	dup2(pipe_fd[1], STDOUT_FILENO);
 	dup2(input_fd, STDIN_FILENO);
+	close(pipe_fd[1]);
+	close(input_fd);
 	exec_cmd(av[2], env);
 }
 //info       --> Create parent routine
@@ -54,6 +56,8 @@ void	parent(char **av, int *pipe_fd, char **env)
 	}
 	dup2(pipe_fd[0], STDIN_FILENO);
 	dup2(output_fd, STDOUT_FILENO);
+	close(pipe_fd[1]);
+	close(output_fd);
 	exec_cmd(av[3], env);
 }
 

@@ -59,9 +59,11 @@ $(NAME): $(SRC) $(LIBFT)
 
 all: $(NAME) 
 
-bonus: $(SRC_BONUS) $(LIBFT)
+$(NAME_BONUS): $(SRC_BONUS) $(LIBFT)
 	$(CC) $(CFLAGS) $(SRC_BONUS) $(LIBFT) -o $(NAME_BONUS)
 	@echo "$(BGRN)✨Bonus compilation completed✨"
+
+bonus: $(NAME_BONUS)
 
 $(LIBFT):
 	@make -C $(LIBFT_D)	

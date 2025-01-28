@@ -21,7 +21,9 @@ typedef struct s_pipex
 	int		ac;
 	char	**av;
 	char	**env;
+	int		cmd_index;
 	int		pipe_fd[2];
+	pid_t	pid;
 }	t_pipex;
 
 # define CMD_NOT_FOUND 127
@@ -36,13 +38,14 @@ typedef struct s_pipex
 # define ERR_OPEN_INPUT "Error: unable to open input file: "
 # define ERR_OPEN_OUTPUT "Error: unable to open output file: "
 
+void	child(t_pipex *pipex);
+void	parent(t_pipex *pipex);
+void	handle_here_doc(t_pipex *pipex);
+void	main_process(t_pipex *pipex);
 void	exec_cmd(char *cmd, char **env);
-void	child(char **av, int *pipe_fd, char **env, int cmd_index);
-void	parent(int ac, char **av, int *pipe_fd, char **env, int cmd_index);
 char	*get_path(char *cmd, char **env);
 void	free_paths(char **paths);
-void	handle_here_doc(const char *limiter, int *pipe_fd);
-void	main_process(int ac, char **av, char **env, int cmd_index);
-pid_t	forking(int *pipe_fd);
+pid_t	forking(t_pipex *pipex);
+void	init_pipex(t_pipex *pipex, int ac, char **av, char **env);
 
 #endif

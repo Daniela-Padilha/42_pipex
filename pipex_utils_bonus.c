@@ -13,18 +13,30 @@
 #include "pipex_bonus.h"
 #include "libft/libft.h"
 
+//info    --> Initialize pipex structure
+
+void	init_pipex(t_pipex *pipex, int ac, char **av, char **env)
+{
+	pipex->av = av;
+	pipex->env = env;
+	pipex->ac = ac;
+	pipex->cmd_index = 2;
+	if (ft_strncmp(av[1], "here_doc", 8) == 0)
+		pipex->cmd_index = 3;
+}
+
 //info    --> Create a pipe and security condition in case of error
 //pipe_fd --> Pipe fd[2], read and write
 
-pid_t	forking(int *pipe_fd)
+pid_t	forking(t_pipex *pipex)
 {
 	pid_t	pid;
 
 	pid = fork();
 	if (pid == -1)
 	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
+		close(pipex->pipe_fd[0]);
+		close(pipex->pipe_fd[1]);
 		ft_putstr_fd(ERR_FORK, 2);
 		exit(EXIT_FAILURE);
 	}

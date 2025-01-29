@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 12:01:36 by ddo-carm          #+#    #+#             */
-/*   Updated: 2024/11/02 16:21:35 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/29 18:05:45 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ size_t	ft_strlen(const char *s)
 	size_t	i;
 
 	i = 0;
+	if(!s)
+		return (0);
 	while (s[i] != '\0')
 	{
 		i++;

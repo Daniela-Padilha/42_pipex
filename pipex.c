@@ -3,15 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipex.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/27 21:26:50 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/29 14:32:57 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include "libft/libft.h"
 
 //info       --> Create child routine
 //av         --> Arg that indicates the file to open
@@ -34,13 +33,12 @@ void	child(char **av, int *pipe_fd, char **env)
 	dup2(input_fd, STDIN_FILENO);
 	close(pipe_fd[1]);
 	close(input_fd);
-	exec_cmd(av[2], env);
+	exec_cmd(av[2], env, pipe_fd);
 }
 //info       --> Create parent routine
 //av         --> Arg that indicates the file to open
 //pipe_fd    --> Pipe fd[2], o read e o write
 //env        --> All environmental variables
-//child_pid	 --> The pid of the child the parent has to wait for
 
 void	parent(char **av, int *pipe_fd, char **env)
 {
@@ -58,7 +56,7 @@ void	parent(char **av, int *pipe_fd, char **env)
 	dup2(output_fd, STDOUT_FILENO);
 	close(pipe_fd[1]);
 	close(output_fd);
-	exec_cmd(av[3], env);
+	exec_cmd(av[3], env, pipe_fd);
 }
 
 //info       --> Create parent routine

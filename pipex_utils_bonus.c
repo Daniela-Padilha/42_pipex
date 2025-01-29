@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
-#include "libft/libft.h"
 
 //info    --> Initialize pipex structure
 
@@ -25,8 +24,7 @@ void	init_pipex(t_pipex *pipex, int ac, char **av, char **env)
 		pipex->cmd_index = 3;
 }
 
-//info    --> Create a pipe and security condition in case of error
-//pipe_fd --> Pipe fd[2], read and write
+//info    --> Create a child and security condition in case of error
 
 pid_t	forking(t_pipex *pipex)
 {
@@ -92,7 +90,7 @@ char	*get_path(char *cmd, char **env)
 		free(exec);
 		i++;
 	}
-	write(2, &ERR_CMD, 26);
+	ft_putstr_fd(ERR_CMD, 2);
 	write(2, cmd, ft_strlen(cmd));
 	return (write(2, "\n", 1), free_paths(paths), exit(CMD_NOT_FOUND), NULL);
 }

@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
-#include "libft/libft.h"
 
 //info       --> Handle the here doc correctly
 //limiter    --> Str that indicates the end of prompt
@@ -26,7 +25,7 @@ void	handle_here_doc(t_pipex *pipex)
 	close(pipex->pipe_fd[0]);
 	while (1)
 	{
-		ft_printf("> ");
+		ft_printf("pipex here_doc> ");
 		line = get_next_line(STDIN_FILENO);
 		if (!line)
 			break ;
@@ -42,10 +41,15 @@ void	handle_here_doc(t_pipex *pipex)
 	close(pipex->pipe_fd[1]);
 }
 
+void	parent(t_pipex *pipex)
+{
+	close(pipex->pipe_fd[1]);
+	dup2(pipex->pipe_fd[0], STDIN_FILENO);
+	close(pipex->pipe_fd[0]);
+	main_process(pipex);
+}
+
 //info       --> Create child routine
-//av         --> Arg that indicates the file to open
-//pipe_fd    --> Pipe fd[2], read and write
-//env        --> All environmental variables
 
 void	child(t_pipex *pipex)
 {
@@ -96,7 +100,7 @@ void	main_process(t_pipex *pipex)
 		pipex->cmd_index++;
 	}
 	final_output_fd = open(pipex->av[pipex->ac - 1],
-			O_WRONLY | O_CREAT | O_TRUNC, 0644);
+			O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (final_output_fd == -1)
 		exit(ft_printf("%s%s\n", ERR_OPEN_OUTPUT, pipex->av[pipex->ac - 1]));
 	dup2(final_output_fd, STDOUT_FILENO);
@@ -121,12 +125,7 @@ int	main(int ac, char **av, char **env)
 		if (pipex.pid == 0)
 			handle_here_doc(&pipex);
 		else
-		{
-			close(pipex.pipe_fd[1]);
-			dup2(pipex.pipe_fd[0], STDIN_FILENO);
-			close(pipex.pipe_fd[0]);
-			main_process(&pipex);
-		}
+			parent(&pipex);
 	}
 	else
 		main_process(&pipex);

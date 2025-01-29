@@ -42,7 +42,7 @@ void	child(t_pipex *pipex);
 void	parent(t_pipex *pipex);
 void	handle_here_doc(t_pipex *pipex);
 void	main_process(t_pipex *pipex);
-void	exec_cmd(char *cmd, char **env);
+void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i);
 char	*get_path(char *cmd, char **env);
 void	free_paths(char **paths);
 pid_t	forking(t_pipex *pipex);

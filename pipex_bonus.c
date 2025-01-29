@@ -74,7 +74,7 @@ void	child(t_pipex *pipex)
 	}
 	dup2(pipex->pipe_fd[1], STDOUT_FILENO);
 	close(pipex->pipe_fd[1]);
-	exec_cmd(pipex->av[pipex->cmd_index], pipex->env);
+	exec_cmd(pipex->av[pipex->cmd_index], pipex->env, pipex->pipe_fd, 0);
 	exit(EXIT_FAILURE);
 }
 
@@ -105,7 +105,7 @@ void	main_process(t_pipex *pipex)
 		exit(ft_printf("%s%s\n", ERR_OPEN_OUTPUT, pipex->av[pipex->ac - 1]));
 	dup2(final_output_fd, STDOUT_FILENO);
 	close(final_output_fd);
-	exec_cmd(pipex->av[pipex->cmd_index], pipex->env);
+	exec_cmd(pipex->av[pipex->cmd_index], pipex->env, pipex->pipe_fd, 0);
 }
 
 int	main(int ac, char **av, char **env)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:29 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/29 14:02:37 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/29 21:14:06 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,12 +72,17 @@ char	*get_path(char *cmd, char **env)
 //path     --> Path to the command
 //cmd_args --> Array of the args of the command
 
-void	exec_cmd(char *cmd, char **env, int *pipe_fd)
+void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i)
 {
 	char	*path;
 	char	**cmd_args;
 
 	cmd_args = ft_split(cmd, ' ');
+	if(!cmd_args[i])
+	{
+		ft_putstr_fd(ERR_ARGS, 2);
+		exit(EXIT_FAILURE);
+	}
 	if (ft_strchr(cmd_args[0], '/'))
 		path = ft_strdup(cmd_args[0]);
 	else

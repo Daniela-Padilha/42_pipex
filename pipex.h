@@ -28,7 +28,7 @@
 # define ERR_OPEN_INPUT "Error: unable to open input file: "
 # define ERR_OPEN_OUTPUT "Error: unable to open output file: "
 
-void	exec_cmd(char *cmd, char **env, int *pipe_fd);
+void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i);
 void	child(char **av, int *pipe_fd, char **env);
 void	parent(char **av, int *pipe_fd, char **env);
 char	*get_path(char *cmd, char **env);

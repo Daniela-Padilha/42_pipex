@@ -101,12 +101,17 @@ char	*get_path(char *cmd, char **env)
 //path     --> Path to the command
 //cmd_args --> Array of the args of the command
 
-void	exec_cmd(char *cmd, char **env)
+void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i)
 {
 	char	*path;
 	char	**cmd_args;
 
 	cmd_args = ft_split(cmd, ' ');
+	if(!cmd_args[i])
+	{
+		ft_putstr_fd(ERR_ARGS, 2);
+		exit(EXIT_FAILURE);
+	}
 	if (ft_strchr(cmd_args[0], '/'))
 		path = ft_strdup(cmd_args[0]);
 	else
@@ -117,6 +122,8 @@ void	exec_cmd(char *cmd, char **env)
 		exit(EXIT_FAILURE);
 	}
 	execve(path, cmd_args, env);
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
 	free(path);
 	free_paths(cmd_args);
 	ft_printf("%s%s\n", ERR_EXECVE, cmd);

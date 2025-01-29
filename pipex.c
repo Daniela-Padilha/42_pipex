@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/29 14:32:57 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/29 18:17:33 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ void	child(char **av, int *pipe_fd, char **env)
 	dup2(input_fd, STDIN_FILENO);
 	close(pipe_fd[1]);
 	close(input_fd);
-	exec_cmd(av[2], env, pipe_fd);
+	exec_cmd(av[2], env, pipe_fd, 0);
 }
 //info       --> Create parent routine
 //av         --> Arg that indicates the file to open
@@ -56,7 +56,7 @@ void	parent(char **av, int *pipe_fd, char **env)
 	dup2(output_fd, STDOUT_FILENO);
 	close(pipe_fd[1]);
 	close(output_fd);
-	exec_cmd(av[3], env, pipe_fd);
+	exec_cmd(av[3], env, pipe_fd, 0);
 }
 
 //info       --> Create parent routine

@@ -12,6 +12,18 @@
 
 #include "pipex_bonus.h"
 
+void	open_file(t_pipex *pipex)
+{
+	if (ft_strncmp(pipex->av[1], "here_doc", 8) == 0)
+		pipex->final_output_fd = open(pipex->av[pipex->ac - 1],
+				O_WRONLY | O_CREAT | O_APPEND, 0644);
+	else
+		pipex->final_output_fd = open(pipex->av[pipex->ac - 1],
+				O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (pipex->final_output_fd == -1)
+		exit(ft_printf("%s%s\n", ERR_OPEN_OUTPUT, pipex->av[pipex->ac - 1]));
+}
+
 //info    --> Initialize pipex structure
 
 void	init_pipex(t_pipex *pipex, int ac, char **av, char **env)
@@ -41,22 +53,6 @@ pid_t	forking(t_pipex *pipex)
 	return (pid);
 }
 
-//info    --> Free all the strings in an array and the array itself
-//paths   --> Array of strings to be freed
-
-void	free_paths(char **paths)
-{
-	int	i;
-
-	i = 0;
-	while (paths[i])
-	{
-		free(paths[i]);
-		i++;
-	}
-	free(paths);
-}
-
 //info        --> Get path for the cmd
 //cmd         --> Comand to be executed
 //env         --> All environmental variables
@@ -66,14 +62,12 @@ void	free_paths(char **paths)
 //exec        --> Adds the cmd to the path, completing the executable path
 //return      --> The path to the cmd
 
-char	*get_path(char *cmd, char **env)
+char	*get_path(char *cmd, char **env, int i)
 {
-	int		i;
 	char	**paths;
 	char	*part_path;
 	char	*exec;
 
-	i = 0;
 	while (env[i] && !ft_strnstr(env[i], "PATH=", 5))
 		i++;
 	paths = ft_split(env[i] + 5, ':');
@@ -86,13 +80,14 @@ char	*get_path(char *cmd, char **env)
 		exec = ft_strjoin(part_path, cmd);
 		free(part_path);
 		if (access(exec, F_OK | X_OK) == 0)
-			return (free_paths(paths), exec);
+			return (free_arrays((void **)paths), exec);
 		free(exec);
 		i++;
 	}
 	ft_putstr_fd(ERR_CMD, 2);
 	write(2, cmd, ft_strlen(cmd));
-	return (write(2, "\n", 1), free_paths(paths), exit(CMD_NOT_FOUND), NULL);
+	write(2, "\n", 1);
+	return (free_arrays((void **)paths), exit(CMD_NOT_FOUND), NULL);
 }
 
 //info     --> Execute a comand
@@ -115,17 +110,17 @@ void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i)
 	if (ft_strchr(cmd_args[0], '/'))
 		path = ft_strdup(cmd_args[0]);
 	else
-		path = get_path(cmd_args[0], env);
+		path = get_path(cmd_args[0], env, 0);
 	if (!path)
 	{
-		free_paths(cmd_args);
+		free_arrays((void **)cmd_args);
 		exit(EXIT_FAILURE);
 	}
 	execve(path, cmd_args, env);
 	close(pipe_fd[0]);
 	close(pipe_fd[1]);
 	free(path);
-	free_paths(cmd_args);
+	free_arrays((void **)cmd_args);
 	ft_printf("%s%s\n", ERR_EXECVE, cmd);
 	exit(EXIT_FAILURE);
 }

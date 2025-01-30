@@ -82,8 +82,6 @@ void	child(t_pipex *pipex)
 
 void	main_process(t_pipex *pipex)
 {
-	int		final_output_fd;
-
 	while (pipex->cmd_index < pipex->ac - 2)
 	{
 		if (pipe(pipex->pipe_fd) == -1)
@@ -99,12 +97,9 @@ void	main_process(t_pipex *pipex)
 		close(pipex->pipe_fd[0]);
 		pipex->cmd_index++;
 	}
-	final_output_fd = open(pipex->av[pipex->ac - 1],
-			O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (final_output_fd == -1)
-		exit(ft_printf("%s%s\n", ERR_OPEN_OUTPUT, pipex->av[pipex->ac - 1]));
-	dup2(final_output_fd, STDOUT_FILENO);
-	close(final_output_fd);
+	open_file(pipex);
+	dup2(pipex->final_output_fd, STDOUT_FILENO);
+	close(pipex->final_output_fd);
 	exec_cmd(pipex->av[pipex->cmd_index], pipex->env, pipex->pipe_fd, 0);
 }
 

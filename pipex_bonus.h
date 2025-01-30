@@ -24,6 +24,7 @@ typedef struct s_pipex
 	int		cmd_index;
 	int		pipe_fd[2];
 	pid_t	pid;
+	int		final_output_fd;
 }	t_pipex;
 
 # define CMD_NOT_FOUND 127
@@ -43,9 +44,9 @@ void	parent(t_pipex *pipex);
 void	handle_here_doc(t_pipex *pipex);
 void	main_process(t_pipex *pipex);
 void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i);
-char	*get_path(char *cmd, char **env);
-void	free_paths(char **paths);
+char	*get_path(char *cmd, char **env, int i);
 pid_t	forking(t_pipex *pipex);
 void	init_pipex(t_pipex *pipex, int ac, char **av, char **env);
+void	open_file(t_pipex *pipex);
 
 #endif

@@ -107,7 +107,7 @@ void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i)
 	char	**cmd_args;
 
 	cmd_args = ft_split(cmd, ' ');
-	if(!cmd_args[i])
+	if (!cmd_args[i])
 	{
 		ft_putstr_fd(ERR_ARGS, 2);
 		exit(EXIT_FAILURE);

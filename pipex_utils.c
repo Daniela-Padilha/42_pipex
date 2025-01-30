@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_utils.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/22 14:03:29 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/29 21:14:06 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/30 12:24:31 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	exec_cmd(char *cmd, char **env, int *pipe_fd, int i)
 	char	**cmd_args;
 
 	cmd_args = ft_split(cmd, ' ');
-	if(!cmd_args[i])
+	if (!cmd_args[i])
 	{
 		ft_putstr_fd(ERR_ARGS, 2);
 		exit(EXIT_FAILURE);

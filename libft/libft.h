@@ -6,7 +6,7 @@
 /*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 12:01:55 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/27 15:06:37 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/01/29 23:10:54 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,5 +97,8 @@ void	*ft_calloc(size_t nmemb, size_t size);
 
 // GNL Bonus
 # define OPEN_MAX 1024
+
+//My Functions
+void	free_arrays(void **array);
 
 #endif

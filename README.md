@@ -2,6 +2,11 @@
 
 Pipex is a 42 school project aimed to better understand shell redirection, processes and pipes, by handling them in C.
 
+## Demo
+Here, I am comparing program's output with the output of the shell pipe.
+
+[pipex.webm](https://github.com/user-attachments/assets/22aeb8e3-878a-4c60-ad45-bc54422f252a)
+
 ## Build
 
 Clone the repository:

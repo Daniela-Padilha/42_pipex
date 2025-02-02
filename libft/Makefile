@@ -58,7 +58,9 @@ SRC = $(SRCS_D)/ft_isalpha.c \
 	$(SRCS_D)/ft_strtrim.c \
 	$(SRCS_D)/ft_split.c \
 	$(SRCS_D)/free_arrays.c \
-	$(SRCS_D)/free_matrix.c \
+	$(SRCS_D)/errors.c \
+	$(SRCS_D)/close_pipe.c \
+
 
 BONUS_SRC = $(SRCS_D)/ft_lstnew_bonus.c \
 			$(SRCS_D)/ft_lstadd_front_bonus.c \

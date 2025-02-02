@@ -1,88 +1,125 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.c                                            :+:      :+:    :+:   */
+/*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/22 14:03:21 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/01/29 18:17:33 by ddo-carm         ###   ########.fr       */
+/*   Created: 2025/01/24 17:17:22 by ddo-carm          #+#    #+#             */
+/*   Updated: 2025/01/24 17:17:22 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-//info       --> Create child routine
-//av         --> Arg that indicates the file to open
-//pipe_fd    --> Pipe fd[2], o read e o write
-//env        --> All environmental variables
+//info       --> Handle the here doc correctly
+//limiter    --> Str that indicates the end of prompt
+//pipe_fd    --> Pipe fd[2], read and write
 
-void	child(char **av, int *pipe_fd, char **env)
+void	handle_here_doc(t_pipex *pipex)
+{
+	char		*line;
+	const char	*limiter;
+
+	limiter = pipex->av[2];
+	close(pipex->pipe_fd[0]);
+	while (1)
+	{
+		ft_printf("pipex here_doc> ");
+		line = get_next_line(STDIN_FILENO);
+		if (!line)
+			break ;
+		if (ft_strncmp(line, limiter, ft_strlen(limiter)) == 0
+			&& line[ft_strlen(limiter)] == '\n')
+		{
+			free(line);
+			break ;
+		}
+		write(pipex->pipe_fd[1], line, ft_strlen(line));
+		free(line);
+	}
+	close(pipex->pipe_fd[1]);
+}
+
+void	parent(t_pipex *pipex)
+{
+	close(pipex->pipe_fd[1]);
+	dup2(pipex->pipe_fd[0], STDIN_FILENO);
+	close(pipex->pipe_fd[0]);
+	main_process(pipex);
+}
+
+//info       --> Create child routine
+
+void	child(t_pipex *pipex)
 {
 	int	input_fd;
 
-	close(pipe_fd[0]);
-	input_fd = open(av[1], O_RDONLY);
-	if (input_fd == -1)
+	close(pipex->pipe_fd[0]);
+	if (ft_strncmp(pipex->av[1], "here_doc", 8) == 0 && pipex->cmd_index == 2)
 	{
-		ft_printf("%s%s\n", ERR_OPEN_INPUT, av[1]);
-		close(pipe_fd[1]);
-		exit(EXIT_FAILURE);
+		handle_here_doc(pipex);
+		exit(EXIT_SUCCESS);
 	}
-	dup2(pipe_fd[1], STDOUT_FILENO);
-	dup2(input_fd, STDIN_FILENO);
-	close(pipe_fd[1]);
-	close(input_fd);
-	exec_cmd(av[2], env, pipe_fd, 0);
+	if (pipex->cmd_index == 2)
+	{
+		input_fd = open(pipex->av[1], O_RDONLY);
+		if (input_fd == -1)
+			errors(ERR_OPEN_INPUT, pipex->av[1], 1);
+		dup2(input_fd, STDIN_FILENO);
+		close(input_fd);
+	}
+	dup2(pipex->pipe_fd[1], STDOUT_FILENO);
+	close(pipex->pipe_fd[1]);
+	exec_cmd(pipex->av[pipex->cmd_index], pipex->env, pipex->pipe_fd, 0);
+	exit(EXIT_FAILURE);
 }
-//info       --> Create parent routine
-//av         --> Arg that indicates the file to open
-//pipe_fd    --> Pipe fd[2], o read e o write
-//env        --> All environmental variables
 
-void	parent(char **av, int *pipe_fd, char **env)
+//info       --> The process to be repeated for each cmd
+
+void	main_process(t_pipex *pipex)
 {
-	int	output_fd;
-
-	close(pipe_fd[1]);
-	output_fd = open(av[4], O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (output_fd == -1)
+	while (pipex->cmd_index < pipex->ac - 2)
 	{
-		ft_printf("%s%s\n", ERR_OPEN_OUTPUT, av[4]);
-		close(pipe_fd[0]);
-		exit(EXIT_FAILURE);
+		if (pipe(pipex->pipe_fd) == -1)
+			ft_putstr_fd(ERR_PIPE, 2);
+		pipex->pid = forking(pipex);
+		if (pipex->pid == 0)
+		{
+			close(pipex->pipe_fd[0]);
+			child(pipex);
+		}
+		close(pipex->pipe_fd[1]);
+		dup2(pipex->pipe_fd[0], STDIN_FILENO);
+		close(pipex->pipe_fd[0]);
+		pipex->cmd_index++;
 	}
-	dup2(pipe_fd[0], STDIN_FILENO);
-	dup2(output_fd, STDOUT_FILENO);
-	close(pipe_fd[1]);
-	close(output_fd);
-	exec_cmd(av[3], env, pipe_fd, 0);
+	open_file(pipex);
+	dup2(pipex->final_output_fd, STDOUT_FILENO);
+	close(pipex->final_output_fd);
+	exec_cmd(pipex->av[pipex->cmd_index], pipex->env, pipex->pipe_fd, 0);
 }
-
-//info       --> Create parent routine
-//ac         --> Argc
-//av         --> Argv
-//env        --> All environmental variables
 
 int	main(int ac, char **av, char **env)
 {
-	int		pipe_fd[2];
-	pid_t	pid;
+	t_pipex	pipex;
 
-	if (ac != 5)
+	if (ac < 5)
 		return (ft_putstr_fd(ERR_ARGS, 2), 1);
-	if (pipe(pipe_fd) == -1)
-		return (ft_putstr_fd(ERR_PIPE, 2), 1);
-	pid = fork();
-	if (pid == -1)
+	if ((ft_strncmp(av[1], "here_doc", 8) == 0 && ac < 6))
+		return (ft_putstr_fd(ERR_ARGS_BONUS, 2), 1);
+	init_pipex(&pipex, ac, av, env);
+	if (pipex.cmd_index == 3)
 	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-		return (ft_putstr_fd(ERR_FORK, 2), 1);
+		if (pipe(pipex.pipe_fd) == -1)
+			return (ft_putstr_fd(ERR_PIPE, 2), 1);
+		pipex.pid = forking(&pipex);
+		if (pipex.pid == 0)
+			handle_here_doc(&pipex);
+		else
+			parent(&pipex);
 	}
-	if (pid == 0)
-		child(av, pipe_fd, env);
-	else if (pid > 0)
-		parent(av, pipe_fd, env);
+	else
+		main_process(&pipex);
 	return (0);
 }

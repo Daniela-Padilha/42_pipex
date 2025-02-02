@@ -19,7 +19,6 @@
 
 
 NAME = pipex
-NAME_BONUS = pipex_bonus
 LIBFT_D = ./libft
 LIBFT = $(LIBFT_D)/libft.a
 SRCS_D = .
@@ -27,10 +26,6 @@ SRCS_D = .
 #source files
 SRC = $(SRCS_D)/pipex.c \
 		$(SRCS_D)/pipex_utils.c 
-
-SRC_BONUS = $(SRCS_D)/pipex_bonus.c \
-			$(SRCS_D)/pipex_utils_bonus.c 
-
 
 #		   ________________________________________________
 #  _______|                                               |_______
@@ -58,13 +53,6 @@ $(NAME): $(SRC) $(LIBFT)
 	$(CC) $(CFLAGS) $(SRC) $(LIBFT) -o $(NAME)
 	@echo "$(BGRN)✨Compilation completed✨"
 
-bonus: $(NAME_BONUS)
-
-$(NAME_BONUS): $(SRC_BONUS) $(LIBFT)
-	$(CC) $(CFLAGS) $(SRC_BONUS) $(LIBFT) -o $(NAME_BONUS)
-	@touch $(NAME)_bonus
-	@echo "$(BGRN)✨Bonus compilation completed✨"
-
 $(LIBFT):
 	@make -C $(LIBFT_D)	
 	@echo "$(BGRN)✨libft compilation completed✨"
@@ -84,7 +72,7 @@ clean:
 
 #clean and remove
 fclean: clean
-	@$(RM) $(NAME) $(NAME_BONUS)
+	@$(RM) $(NAME)
 	@make fclean -C $(LIBFT_D)
 	@echo "$(BMAG)✨Program removed $(BGRN)successfully✨"
 

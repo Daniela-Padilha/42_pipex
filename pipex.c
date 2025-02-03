@@ -37,6 +37,7 @@ void	handle_here_doc(t_pipex *pipex)
 		}
 		write(pipex->pipe_fd[1], line, ft_strlen(line));
 		free(line);
+		line = NULL;
 	}
 	close(pipex->pipe_fd[1]);
 }
@@ -108,7 +109,6 @@ int	main(int ac, char **av, char **env)
 		return (ft_putstr_fd(ERR_ARGS, 2), 1);
 	if ((ft_strncmp(av[1], "here_doc", 8) == 0 && ac < 6))
 		return (ft_putstr_fd(ERR_ARGS_BONUS, 2), 1);
-	if (ac > 5 && (ac - 2) )
 	init_pipex(&pipex, ac, av, env);
 	if (pipex.cmd_index == 3)
 	{

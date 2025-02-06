@@ -106,10 +106,10 @@ char	*get_next_line(int fd)
 		return (NULL);
 	line = ft_extract_line(buffer);
 	buffer = ft_next_line(buffer);
-	if (buffer && !*buffer) 
+	if (buffer && !*buffer)
 	{
-        free(buffer);
-        buffer = NULL;
+		free(buffer);
+		buffer = NULL;
 	}
 	return (line);
 }

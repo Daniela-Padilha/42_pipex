@@ -17,18 +17,14 @@ Enter the cloned directory
 ```shell
 cd 42_pipex
 ```
-Run `make` to compile the program without bonus:
+Run `make` to compile the program:
 ```shell
 make
-```
-With bonus:
-```shell
-make bonus
 ```
 
 ## Usage
 
-Without bonus the input:
+The input:
 ```shell
 ./pipex file1 cmd1 cmd2 file2
 ```
@@ -36,7 +32,7 @@ Behaves like:
 ```shell
 < file1 cmd1 | cmd2 > file2
 ```
-With the bonus the input:
+The input:
 ```shell
 ./pipex_bonus file1 cmd1 cmd2 cmd3 ... cmdn file2
 ```

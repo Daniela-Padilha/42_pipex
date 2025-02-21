@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ddo-carm <ddo-carm@student.42.fr>          +#+  +:+       +#+        */
+/*   By: ddo-carm <ddo-carm@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/21 12:01:55 by ddo-carm          #+#    #+#             */
-/*   Updated: 2025/02/03 14:52:13 by ddo-carm         ###   ########.fr       */
+/*   Updated: 2025/02/20 15:37:53 by ddo-carm         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,10 @@ void	*ft_calloc(size_t nmemb, size_t size);
 
 //My Functions
 void	free_arrays(void **array);
+void	free_matrix(void ***matrix);
 void	errors(char *message, char *complete, int if_exit);
 void	close_pipe(int *fd);
+int		ft_atoi_base(const char *str, int base);
+int		ft_is_space(char c);
 
 #endif
